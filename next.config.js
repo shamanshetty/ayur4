@@ -1,15 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    // Allow production builds to successfully complete even if there are ESLint errors
+    // Disable ESLint during builds
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Allow production builds to successfully complete even if there are TypeScript errors
+    // Disable TypeScript type checking during builds
     ignoreBuildErrors: true,
   },
+  // Disable source maps for faster builds
+  productionBrowserSourceMaps: false,
   // Optimize for deployment
-  output: 'standalone'
+  experimental: {
+    forceSwcTransforms: true,
+  }
 }
 
 module.exports = nextConfig
