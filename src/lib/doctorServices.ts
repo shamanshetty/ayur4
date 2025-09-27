@@ -177,6 +177,60 @@ export class DoctorService {
       throw error
     }
   }
+
+  // Get doctor appointments
+  static async getDoctorAppointments(doctorId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          *,
+          patients(first_name, last_name, phone)
+        `)
+        .eq('practitioner_id', doctorId)
+        .order('event_date', { ascending: false })
+
+      if (error) throw error
+
+      // Transform data to match expected format
+      return data?.map(event => ({
+        id: event.id,
+        patient_id: event.patient_id,
+        doctor_id: event.practitioner_id,
+        appointment_date: event.event_date,
+        appointment_time: event.event_time,
+        status: event.status || 'confirmed',
+        consultation_type: event.type || 'video',
+        symptoms: event.description || '',
+        notes: event.booking_notes || '',
+        patient_name: event.patients ? `${event.patients.first_name} ${event.patients.last_name}` : 'Unknown',
+        patient_phone: event.patients?.phone || event.patient_phone || '',
+        created_at: event.created_at,
+        updated_at: event.updated_at
+      })) || []
+    } catch (error) {
+      console.error('Error fetching doctor appointments:', error)
+      return []
+    }
+  }
+
+  // Update appointment status
+  static async updateAppointmentStatus(appointmentId: string, status: string) {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .update({ status })
+        .eq('id', appointmentId)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } catch (error) {
+      console.error('Error updating appointment status:', error)
+      throw error
+    }
+  }
 }
 
 // Appointment Booking Services
@@ -382,3 +436,10 @@ export class ReviewService {
     }
   }
 }
+
+// Export individual functions for easier importing
+export const searchDoctors = DoctorService.searchDoctors
+export const getDoctorById = DoctorService.getDoctorById
+export const getDoctorAppointments = DoctorService.getDoctorAppointments
+export const updateAppointmentStatus = DoctorService.updateAppointmentStatus
+export const getDoctorReviews = DoctorService.getDoctorReviews
