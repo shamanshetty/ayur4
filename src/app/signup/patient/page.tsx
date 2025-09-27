@@ -41,6 +41,8 @@ export default function PatientSignup() {
   const handlePrev = () => setStep(step - 1)
 
   const handleSubmit = () => {
+    // Store form data in localStorage
+    localStorage.setItem('patientData', JSON.stringify(formData))
     // Redirect to patient dashboard
     window.location.href = '/dashboard/patient'
   }
@@ -48,9 +50,9 @@ export default function PatientSignup() {
   const handleArrayToggle = (field: string, value: string) => {
     setFormData({
       ...formData,
-      [field]: formData[field].includes(value)
-        ? formData[field].filter(item => item !== value)
-        : [...formData[field], value]
+      [field]: (formData[field as keyof typeof formData] as string[]).includes(value)
+        ? (formData[field as keyof typeof formData] as string[]).filter(item => item !== value)
+        : [...(formData[field as keyof typeof formData] as string[]), value]
     })
   }
 
@@ -110,7 +112,7 @@ export default function PatientSignup() {
       <div className="flex-1 p-12">
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
-          <a href="/" className="font-display text-2xl font-bold text-white">AyurSutra</a>
+          <span className="font-display text-2xl font-bold text-white cursor-pointer" onClick={() => window.location.href = '/'}>AyurSutra</span>
           <div className="flex items-center space-x-4">
             <a href="#" className="text-white bg-white bg-opacity-20 px-4 py-2 rounded-full">About Us</a>
             <a href="#" className="text-white px-4 py-2">Community</a>
@@ -423,14 +425,27 @@ export default function PatientSignup() {
                 <label className="block text-white text-sm font-medium mb-4">Activity Level</label>
                 <div className="relative">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-cyan-400">Low</span>
-                    <span className="text-white">Moderate</span>
-                    <span className="text-cyan-400">High</span>
+                    <span className={`${formData.activityLevel === 'low' ? 'text-cyan-400' : 'text-gray-400'}`}>Low</span>
+                    <span className={`${formData.activityLevel === 'moderate' ? 'text-white' : 'text-gray-400'}`}>Moderate</span>
+                    <span className={`${formData.activityLevel === 'high' ? 'text-cyan-400' : 'text-gray-400'}`}>High</span>
                   </div>
                   <div className="relative">
-                    <div className="w-full h-2 bg-gray-600 rounded-full"></div>
-                    <div className="absolute top-0 left-0 h-2 bg-cyan-500 rounded-full" style={{width: '60%'}}></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-cyan-500"></div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="2"
+                      step="1"
+                      value={formData.activityLevel === 'low' ? 0 : formData.activityLevel === 'moderate' ? 1 : 2}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        const level = value === 0 ? 'low' : value === 1 ? 'moderate' : 'high';
+                        setFormData({...formData, activityLevel: level});
+                      }}
+                      className="w-full h-2 bg-gray-600 rounded-full appearance-none slider"
+                      style={{
+                        background: `linear-gradient(to right, #06b6d4 0%, #06b6d4 ${formData.activityLevel === 'low' ? '0' : formData.activityLevel === 'moderate' ? '50' : '100'}%, #4b5563 ${formData.activityLevel === 'low' ? '0' : formData.activityLevel === 'moderate' ? '50' : '100'}%, #4b5563 100%)`
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -443,7 +458,6 @@ export default function PatientSignup() {
                     'Stress & Anxiety Reduction',
                     'Improve Sleep Quality',
                     'Pain Management',
-                    'Boost Energy & Vitality',
                     'Boost Energy & Vitality',
                     'General Well-being',
                     'Detoxification & Cleansing',

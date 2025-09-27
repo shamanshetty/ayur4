@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function PatientDashboard() {
   const [treatmentHistory] = useState([
@@ -8,6 +8,18 @@ export default function PatientDashboard() {
     { name: 'Snehapana', date: '22 Sept 2025', color: 'bg-green-400' },
     { name: 'Abhyanga', date: '23 Sept 2025', color: 'bg-cyan-400' }
   ])
+
+  const [userName, setUserName] = useState('Ram')
+
+  useEffect(() => {
+    const patientData = localStorage.getItem('patientData')
+    if (patientData) {
+      const data = JSON.parse(patientData)
+      if (data.firstName) {
+        setUserName(data.firstName)
+      }
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -18,7 +30,7 @@ export default function PatientDashboard() {
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gray-600 rounded-full"></div>
             <div>
-              <h3 className="font-semibold">Hii, Ram!</h3>
+              <h3 className="font-semibold">Hii, {userName}!</h3>
             </div>
           </div>
         </div>
@@ -32,15 +44,12 @@ export default function PatientDashboard() {
               </svg>
               <span>Dashboard</span>
             </a>
-            <button
-              onClick={() => alert('Calendar feature coming soon!')}
-              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg text-left"
-            >
+            <a href="/calendar" className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>Calendar</span>
-            </button>
+            </a>
             <a href="/discover" className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
@@ -71,7 +80,7 @@ export default function PatientDashboard() {
 
         {/* AyurSutra Logo */}
         <div className="p-6 border-t border-gray-700">
-          <a href="/" className="font-display text-xl font-bold">AyurSutra</a>
+          <span className="font-display text-xl font-bold cursor-pointer" onClick={() => window.location.href = '/'}>AyurSutra</span>
         </div>
       </div>
 

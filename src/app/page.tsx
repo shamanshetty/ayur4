@@ -1,10 +1,12 @@
+'use client'
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
       <nav className="bg-white shadow-sm px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <a href="/" className="font-display text-2xl font-bold hover:text-gray-700 transition-colors">AyurSutra</a>
+          <span className="font-display text-2xl font-bold hover:text-gray-700 transition-colors cursor-pointer">AyurSutra</span>
           <div className="flex items-center space-x-6">
             <a href="#science" className="text-gray-600 hover:text-gray-900 px-4 py-2">About Us</a>
             <a href="/community" className="text-gray-600 hover:text-gray-900 px-4 py-2">Community</a>
@@ -44,10 +46,16 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-purple-600 text-white px-8 py-4 rounded-full font-medium hover:bg-purple-700 transition-colors">
+                <button
+                  onClick={() => window.location.href = '/signup'}
+                  className="bg-purple-600 text-white px-8 py-4 rounded-full font-medium hover:bg-purple-700 transition-colors"
+                >
                   Start Your Healing →
                 </button>
-                <button className="bg-teal-600 text-white px-8 py-4 rounded-full font-medium hover:bg-teal-700 transition-colors">
+                <button
+                  onClick={() => alert('Coming soon!')}
+                  className="bg-teal-600 text-white px-8 py-4 rounded-full font-medium hover:bg-teal-700 transition-colors"
+                >
                   Join as Practitioner →
                 </button>
               </div>
@@ -132,7 +140,7 @@ export default function Home() {
             The <span className="font-display italic">Science</span> of Life
           </h2>
           <p className="text-xl text-gray-600 mb-12 max-w-4xl mx-auto">
-            Ayurveda, literally meaning "knowledge of life," is the world's oldest holistic healing system, originating in India over 5,000 years ago.
+            Ayurveda, literally meaning &quot;knowledge of life,&quot; is the world&apos;s oldest holistic healing system, originating in India over 5,000 years ago.
           </p>
 
           <div className="grid md:grid-cols-4 gap-8 mb-16">
@@ -151,13 +159,13 @@ export default function Home() {
             <div className="text-left">
               <h3 className="text-lg font-bold mb-2">Panchakarma Detox</h3>
               <p className="text-sm text-gray-600">
-                Panchakarma, meaning "five actions," is Ayurveda's premier detoxification and rejuvenation program that eliminates toxins, restores balance, and enhances vitality through specialized therapeutic procedures.
+                Panchakarma, meaning &quot;five actions,&quot; is Ayurveda&apos;s premier detoxification and rejuvenation program that eliminates toxins, restores balance, and enhances vitality through specialized therapeutic procedures.
               </p>
             </div>
             <div className="text-left">
               <h3 className="text-lg font-bold mb-2">Modern Relevance</h3>
               <p className="text-sm text-gray-600">
-                In our fast-paced world, Ayurveda's holistic approach to prevention and healing is more relevant than ever, offering sustainable solutions for chronic stress, lifestyle disorders, and overall wellness.
+                In our fast-paced world, Ayurveda&apos;s holistic approach to prevention and healing is more relevant than ever, offering sustainable solutions for chronic stress, lifestyle disorders, and overall wellness.
               </p>
             </div>
           </div>
@@ -180,7 +188,7 @@ export default function Home() {
               <div className="bg-white p-6 rounded-2xl shadow-lg text-left">
                 <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div>
                 <p className="text-sm text-gray-600 mb-4">
-                  Managing multiple patients across special therapy need never been easier. AyurSutra's integrated feedback system saves time while delivering effective feedback and personalized attention.
+                  Managing multiple patients across special therapy need never been easier. AyurSutra&apos;s integrated feedback system saves time while delivering effective feedback and personalized attention.
                 </p>
                 <div className="font-medium">Ayurveda Practitioner</div>
               </div>
