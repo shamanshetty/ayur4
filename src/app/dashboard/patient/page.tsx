@@ -1,5 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { AuthService } from '@/lib/services'
+import Chatbot, { ChatbotButton } from '@/components/Chatbot'
+import { NotificationButton } from '@/components/NotificationSystem'
 
 export default function PatientDashboard() {
   const [treatmentHistory] = useState([
@@ -10,16 +13,65 @@ export default function PatientDashboard() {
   ])
 
   const [userName, setUserName] = useState('Ram')
+  const [userAge, setUserAge] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false)
 
   useEffect(() => {
-    const patientData = localStorage.getItem('patientData')
-    if (patientData) {
-      const data = JSON.parse(patientData)
-      if (data.firstName) {
-        setUserName(data.firstName)
+    loadPatientData()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadPatientData = async () => {
+    try {
+      // Try to get data from Supabase first
+      const patient = await AuthService.getCurrentPatient()
+      if (patient) {
+        setUserName(patient.first_name || 'User')
+        if (patient.date_of_birth) {
+          const age = calculateAge(patient.date_of_birth)
+          setUserAge(age.toString())
+        }
+      } else {
+        // Fallback to localStorage
+        const patientData = localStorage.getItem('patientData')
+        if (patientData) {
+          const data = JSON.parse(patientData)
+          setUserName(data.firstName || 'User')
+          if (data.dateOfBirth) {
+            const age = calculateAge(data.dateOfBirth)
+            setUserAge(age.toString())
+          }
+        }
       }
+    } catch (error) {
+      console.error('Error loading patient data:', error)
+      // Fallback to localStorage
+      const patientData = localStorage.getItem('patientData')
+      if (patientData) {
+        const data = JSON.parse(patientData)
+        setUserName(data.firstName || 'User')
+        if (data.dateOfBirth) {
+          const age = calculateAge(data.dateOfBirth)
+          setUserAge(age.toString())
+        }
+      }
+    } finally {
+      setIsLoading(false)
     }
-  }, [])
+  }
+
+  const calculateAge = (dateOfBirth: string): number => {
+    const today = new Date()
+    const birthDate = new Date(dateOfBirth)
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+
+    return age
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -28,9 +80,13 @@ export default function PatientDashboard() {
         {/* Profile Section */}
         <div className="p-6 border-b border-gray-700">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gray-600 rounded-full"></div>
+            <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-medium">{userName.charAt(0).toUpperCase()}</span>
+            </div>
             <div>
               <h3 className="font-semibold">Hii, {userName}!</h3>
+              {userAge && <p className="text-sm text-gray-400">Age: {userAge}</p>}
+              {isLoading && <p className="text-sm text-gray-400">Loading...</p>}
             </div>
           </div>
         </div>
@@ -49,6 +105,24 @@ export default function PatientDashboard() {
                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>Calendar</span>
+            </a>
+            <a href="/consultation" className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+              </svg>
+              <span>AI Consultation</span>
+            </a>
+            <a href="/find-doctors" className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Find Doctors</span>
+            </a>
+            <a href="/my-appointments" className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+              </svg>
+              <span>My Appointments</span>
             </a>
             <a href="/discover" className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -101,6 +175,7 @@ export default function PatientDashboard() {
             </button>
           </div>
           <div className="flex items-center space-x-4">
+            <NotificationButton />
             <button
               onClick={() => window.location.href = '/#contact'}
               className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
@@ -378,6 +453,10 @@ export default function PatientDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Chatbot */}
+      {!isChatbotOpen && <ChatbotButton onClick={() => setIsChatbotOpen(true)} />}
+      <Chatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
     </div>
   )
 }

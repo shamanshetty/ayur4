@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { AuthService, convertFormDataToPatient } from '@/lib/services'
 
 export default function PatientSignup() {
   const [step, setStep] = useState(1)
@@ -40,11 +41,29 @@ export default function PatientSignup() {
   const handleNext = () => setStep(step + 1)
   const handlePrev = () => setStep(step - 1)
 
-  const handleSubmit = () => {
-    // Store form data in localStorage
-    localStorage.setItem('patientData', JSON.stringify(formData))
-    // Redirect to patient dashboard
-    window.location.href = '/dashboard/patient'
+  const handleSubmit = async () => {
+    try {
+      // Store in localStorage as immediate fallback
+      localStorage.setItem('patientData', JSON.stringify(formData))
+
+      // Create a simple password from name + birth year for demo
+      const password = `${formData.firstName.toLowerCase()}${new Date(formData.dateOfBirth).getFullYear()}`
+
+      // Convert form data to patient format
+      const patientData = convertFormDataToPatient(formData)
+
+      // Sign up with Supabase
+      const result = await AuthService.signUp(formData.email, password, patientData)
+      console.log('Signup successful:', result)
+
+      // Redirect to patient dashboard
+      window.location.href = '/dashboard/patient'
+    } catch (error) {
+      console.error('Error during signup:', error)
+      // Fallback to localStorage and continue - don't block user flow
+      localStorage.setItem('patientData', JSON.stringify(formData))
+      window.location.href = '/dashboard/patient'
+    }
   }
 
   const handleArrayToggle = (field: string, value: string) => {

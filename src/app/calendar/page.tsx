@@ -1,15 +1,33 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Chatbot, { ChatbotButton } from '@/components/Chatbot'
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [userName, setUserName] = useState('Ram')
-  const [events, setEvents] = useState([
-    { id: 1, title: 'Consultation with Dr. Sharma', date: '2025-03-15', type: 'meeting' },
-    { id: 2, title: 'Panchakarma Session', date: '2025-03-18', type: 'treatment' },
-    { id: 3, title: 'Follow-up Call', date: '2025-03-22', type: 'call' },
-    { id: 4, title: 'Abhyanga Therapy', date: '2025-03-25', type: 'treatment' }
-  ])
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false)
+  const [events, setEvents] = useState([])
+
+  useEffect(() => {
+    const loadAppointments = () => {
+      const appointments = [
+        { id: 1, title: 'Consultation with Dr. Sharma', date: '2025-03-15', type: 'meeting' },
+        { id: 2, title: 'Panchakarma Session', date: '2025-03-18', type: 'treatment' },
+        { id: 3, title: 'Follow-up Call', date: '2025-03-22', type: 'call' },
+        { id: 4, title: 'Abhyanga Therapy', date: '2025-03-25', type: 'treatment' }
+      ]
+
+      const today = new Date().toISOString().split('T')[0]
+      const upcomingAppointments = [
+        { id: 5, title: 'Video Consultation - Dr. Kumar', date: today, type: 'meeting' },
+        { id: 6, title: 'In-person Checkup - Dr. Patel', date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], type: 'meeting' }
+      ]
+
+      setEvents([...appointments, ...upcomingAppointments])
+    }
+
+    loadAppointments()
+  }, [])
 
   useEffect(() => {
     const patientData = localStorage.getItem('patientData')
@@ -128,6 +146,12 @@ export default function Calendar() {
               </svg>
               <span>Calendar</span>
             </a>
+            <a href="/find-doctors" className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Find Doctors</span>
+            </a>
             <a href="/discover" className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
@@ -243,6 +267,10 @@ export default function Calendar() {
           </div>
         </div>
       </div>
+
+      {/* Chatbot */}
+      {!isChatbotOpen && <ChatbotButton onClick={() => setIsChatbotOpen(true)} />}
+      <Chatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
     </div>
   )
 }
